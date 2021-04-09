@@ -1,18 +1,14 @@
 #[macro_use]
-extern crate diesel;
+pub extern crate diesel;
 
-
-pub use diesel::prelude::ConnectionError;
 pub mod models;
 pub use crate::models::*;
 pub mod enums;
 
-use diesel::prelude::*;
+pub use diesel::prelude::*;
 use diesel::mysql::MysqlConnection;
 
-pub mod schema {
-    include!("schema.rs");
-}
+pub mod schema;
 
 pub fn format_database_url(username: &String, password: &String, address: &String, database_name: &String) -> String {
     format!("mysql://{}:{}@{}/{}", username, password, address, database_name)
@@ -23,11 +19,16 @@ pub fn establish_connection(database_url: String) -> Result<MysqlConnection, Con
 }
 
 
+
 #[cfg(test)]
 mod tests {
     use dotenv::dotenv;
     use std::env;
-    use crate::*;
+    use crate::MysqlConnection;
+    use crate::format_database_url;
+    use crate::establish_connection;
+    use crate::User;
+    use crate::diesel::prelude::*;
     use crate::schema::users::dsl;
 
     const TEST_DB_ERROR: &str = "\nTo run the tests, you need to have a local mysql database set up. \n\
@@ -59,6 +60,6 @@ mod tests {
     fn test_get_db_content() {
         dotenv().ok();
         let conn = get_test_conn();
-        let us: Vec<User> = dsl::users.filter(dsl::isActive.eq(true)).load::<User>(&conn).unwrap();
+        let _us: Vec<User> = dsl::users.filter(dsl::isActive.eq(true)).load::<User>(&conn).unwrap();
     }
 }
