@@ -1,12 +1,14 @@
 #[macro_use]
 pub extern crate diesel;
+pub use diesel::prelude::*;
+pub use diesel::mysql::MysqlConnection;
+pub use diesel::r2d2::ConnectionManager;
 
 pub mod models;
 pub use crate::models::*;
 pub mod enums;
 
-pub use diesel::prelude::*;
-use diesel::mysql::MysqlConnection;
+
 
 pub mod schema;
 

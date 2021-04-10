@@ -6,7 +6,7 @@ edition = "2018"
 
 [dependencies]
 lettre = "0.10.0-beta.3"
-diesel = { version = "1.4.4", features = ["mysql", "chrono"] }
+diesel = { version = "1.4.4", features = ["mysql", "chrono", "r2d2"] }
 chrono = "0.4.19"
 
 [dev-dependencies]
