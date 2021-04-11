@@ -8,7 +8,7 @@ table! {
         dateEnd -> Nullable<Date>,
         end -> Time,
         location -> Nullable<Varchar>,
-        isRegularPractice -> Nullable<Bool>,
+        isRegularPractice -> Bool,
     }
 }
 

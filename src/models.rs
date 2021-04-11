@@ -1,4 +1,4 @@
-use chrono::{NaiveDate, NaiveTime};
+use chrono::{NaiveDate, NaiveTime, NaiveDateTime};
 
 pub use crate::enums::*;
 
@@ -49,7 +49,7 @@ pub struct UserEvent {
     pub id: i32,
     pub user_id: i32,
     pub event_id: i32,
-    pub response: Response,
+    pub response: Option<Response>,
     pub comment: Option<String>
 }
 
@@ -58,6 +58,6 @@ pub struct UserPushConfig {
     pub id: i32,
     pub user_id: i32,
     pub device_name: String,
-    pub date: NaiveDate,
+    pub date: NaiveDateTime,
     pub push_config: String
 }

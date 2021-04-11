@@ -54,7 +54,7 @@ impl<Db: Backend> ToSql<ResponseType, Db> for Response {
 }
 
 /// Converts the SQL enum options into rust enum options
-impl FromSql<Response, Mysql> for Response {
+impl FromSql<ResponseType, Mysql> for Response {
     fn from_sql(bytes: Option<&<Mysql as Backend>::RawValue>) -> deserialize::Result<Self> {
         match not_none!(bytes) {
             b"yes" => Ok(Response::Yes),
