@@ -19,8 +19,8 @@ pub fn format_database_url(
     format!("mysql://{username}:{password}@{address}/{database_name}")
 }
 
-pub fn establish_connection(database_url: String) -> Result<MysqlConnection, ConnectionError> {
-    MysqlConnection::establish(&database_url)
+pub fn establish_connection(database_url: &str) -> Result<MysqlConnection, ConnectionError> {
+    MysqlConnection::establish(database_url)
 }
 
 #[cfg(test)]
@@ -55,7 +55,7 @@ mod tests {
             &env::var("DATABASE_ADDRESS").expect(TEST_DB_ERROR),
             &env::var("DATABASE_NAME").expect(TEST_DB_ERROR),
         );
-        let conn = establish_connection(db_url).unwrap();
+        let conn = establish_connection(&db_url).unwrap();
         conn
     }
 
