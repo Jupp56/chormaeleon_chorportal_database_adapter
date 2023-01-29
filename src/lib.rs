@@ -11,10 +11,10 @@ pub mod enums;
 pub mod schema;
 
 pub fn format_database_url(
-    username: &String,
-    password: &String,
-    address: &String,
-    database_name: &String,
+    username: &str,
+    password: &str,
+    address: &str,
+    database_name: &str,
 ) -> String {
     format!("mysql://{username}:{password}@{address}/{database_name}")
 }
