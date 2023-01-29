@@ -31,7 +31,7 @@ pub struct ResponseType;
 ///
 /// This is the enum to use in business logic.
 /// For use in the database schema, use the ResponseType struct via ```enums::exports::ResponseType```
-#[derive(Clone, Copy, Debug, FromSqlRow, AsExpression)]
+#[derive(AsExpression, Clone, Copy, Debug, FromSqlRow, PartialEq, PartialOrd)]
 #[diesel(sql_type = ResponseType)]
 pub enum Response {
     Yes,
@@ -77,7 +77,7 @@ pub struct ChannelType;
 ///
 /// This is the enum to use in business logic.
 /// For use in the database schema, use the ChannelType struct via ```enums::exports::ChannelType```
-#[derive(Clone, Copy, Debug, FromSqlRow, AsExpression)]
+#[derive(AsExpression, Clone, Copy, Debug, FromSqlRow, PartialEq, PartialOrd)]
 #[diesel(sql_type = ChannelType)]
 pub enum Channel {
     None,
@@ -127,7 +127,7 @@ pub struct SectionType;
 ///
 /// This is the enum to use in business logic.
 /// For use in the database schema, use the ChannelType struct via ```enums::exports::SectionType```
-#[derive(Clone, Copy, Debug, FromSqlRow, AsExpression)]
+#[derive(AsExpression, Clone, Copy, Debug, FromSqlRow, PartialEq, PartialOrd)]
 #[diesel(sql_type = SectionType)]
 pub enum Section {
     Sopran,

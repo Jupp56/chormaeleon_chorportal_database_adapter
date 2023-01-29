@@ -3,7 +3,7 @@ use diesel::Queryable;
 
 pub use crate::enums::*;
 
-#[derive(Debug, Queryable)]
+#[derive(Clone, Debug, PartialEq, Queryable)]
 pub struct User {
     pub id: i32,
     pub email: String,
@@ -32,7 +32,7 @@ pub struct User {
     pub password_reset_date: Option<NaiveDate>,
 }
 
-#[derive(Debug, Queryable)]
+#[derive(Clone, Debug, PartialEq, PartialOrd, Queryable)]
 pub struct Event {
     pub id: i32,
     pub name: String,
@@ -45,7 +45,7 @@ pub struct Event {
     pub is_regular_practice: bool,
 }
 
-#[derive(Debug, Queryable)]
+#[derive(Clone, Debug, PartialEq, PartialOrd, Queryable)]
 pub struct UserEvent {
     pub id: i32,
     pub user_id: i32,
@@ -54,7 +54,7 @@ pub struct UserEvent {
     pub comment: Option<String>,
 }
 
-#[derive(Debug, Queryable)]
+#[derive(Clone, Debug, PartialEq, PartialOrd, Queryable)]
 pub struct UserPushConfig {
     pub id: i32,
     pub user_id: i32,
@@ -63,7 +63,7 @@ pub struct UserPushConfig {
     pub push_config: String,
 }
 
-#[derive(Debug, Queryable)]
+#[derive(Clone, Debug, PartialEq, PartialOrd, Queryable)]
 pub struct BlogPost {
     pub id: i32,
     pub author_id: Option<i32>,
