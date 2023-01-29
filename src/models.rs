@@ -1,4 +1,5 @@
-use chrono::{NaiveDate, NaiveTime, NaiveDateTime};
+use chrono::{NaiveDate, NaiveDateTime, NaiveTime};
+use diesel::Queryable;
 
 pub use crate::enums::*;
 
@@ -28,7 +29,7 @@ pub struct User {
     pub channel_songbook_change: Channel,
     pub channel_album_change: Channel,
     pub password_reset_key: Option<String>,
-    pub password_reset_date: Option<NaiveDate>
+    pub password_reset_date: Option<NaiveDate>,
 }
 
 #[derive(Debug, Queryable)]
@@ -41,7 +42,7 @@ pub struct Event {
     pub date_end: Option<NaiveDate>,
     pub end: NaiveTime,
     pub location: Option<String>,
-    pub is_regular_practice: bool
+    pub is_regular_practice: bool,
 }
 
 #[derive(Debug, Queryable)]
@@ -50,7 +51,7 @@ pub struct UserEvent {
     pub user_id: i32,
     pub event_id: i32,
     pub response: Option<Response>,
-    pub comment: Option<String>
+    pub comment: Option<String>,
 }
 
 #[derive(Debug, Queryable)]
@@ -59,5 +60,15 @@ pub struct UserPushConfig {
     pub user_id: i32,
     pub device_name: String,
     pub date: NaiveDateTime,
-    pub push_config: String
+    pub push_config: String,
+}
+
+#[derive(Debug, Queryable)]
+pub struct BlogPost {
+    pub id: i32,
+    pub author_id: Option<i32>,
+    pub created_at: NaiveDateTime,
+    pub updated_at: NaiveDateTime,
+    pub header: Option<String>,
+    pub content: Option<String>,
 }

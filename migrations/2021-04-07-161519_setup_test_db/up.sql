@@ -59,6 +59,16 @@ CREATE TABLE IF NOT EXISTS `userPushConfig` (
     UNIQUE (userId, deviceName)
     );
 
+CREATE TABLE IF NOT EXISTS `blogPosts` (
+  `id` int NOT NULL PRIMARY KEY auto_increment,
+  `authorId` int,
+  `createdAt` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updatedAt` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `header` varchar(1000),
+  `content` text,
+  FOREIGN KEY(authorId) REFERENCES users(id) ON DELETE SET NULL
+);
+
 INSERT INTO `users` (`email`, `password`, `firstName`, `lastName`, `birthday`, `isAdmin`, `section`, `imageFilePath`, `registrationDate`) VALUES ('test@test.com', '$6$rounds=5000$26fb6ee1f1e483d5$pH32.NS1UbRzSjvhLWhGJ2WFllu51szmiRG9WhGnHMXmOHzLrYVYfbd0AZGMUa6QZNSYGh3GRIxAew6XaXR7i1', 'Maxime', 'Mustermann', '2000-01-01', true, 'Sopran', 'defaultPortraitSopran.jpeg', '2019-06-01');
 INSERT INTO `users` (`email`, `password`, `firstName`, `lastName`, `birthday`, `isAdmin`, `section`, `imageFilePath`, `registrationDate`) VALUES ('morian@test.com', '$6$rounds=5000$26fb6ee1f1e483d5$pH32.NS1UbRzSjvhLWhGJ2WFllu51szmiRG9WhGnHMXmOHzLrYVYfbd0AZGMUa6QZNSYGh3GRIxAew6XaXR7i1', 'Morian', 'Flyer', '2001-05-25', false, 'Tenor', 'defaultPortraitTenor.jpeg', '2018-01-01');
 INSERT INTO `events` (`name`, `date`, `start`, `end`, `isRegularPractice`) VALUES ('Testkonzert', '2020-10-08', '01:02:03', '04:05:06', false);

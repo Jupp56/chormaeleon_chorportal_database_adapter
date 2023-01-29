@@ -1,3 +1,6 @@
+use diesel::deserialize::{self, FromSql};
+use diesel::mysql::Mysql;
+use diesel::serialize::{self, IsNull, Output, ToSql};
 /// We define the enums used in the database here.
 /// The abominations below are necessary to cast the rust enum type to the database enum.
 /// Advantage: We cannot possibly misuse it in our code.
@@ -6,26 +9,21 @@
 /// If you are somewhat confident in rust and diesel, go for it.
 /// While at it - change this to diesel enum derive - I did not get it to run automatically, so I manually mapped it.
 /// Otherwise: DON'T. It took me an afternoon and an (example for postgres)[https://github.com/l4l/diesel-custom-types] and a lot of nerves to get this to work.
-
-
-use diesel::backend::Backend;
-use diesel::serialize::{self, IsNull, Output, ToSql};
-use diesel::deserialize::{self, FromSql};
+use diesel::{backend, AsExpression, FromSqlRow, SqlType};
 use std::io::Write;
-use diesel::mysql::Mysql;
 
 ///The custom mapped types for our enums, ready to use in the database schema (schema.rs)
 pub mod exports {
     pub use super::ChannelType;
-    pub use super::SectionType;
     pub use super::ResponseType;
+    pub use super::SectionType;
 }
 
 /// ONLY FOR USE IN DATABASE SCHEMA - use ```enums::Response``` in business logic!
 ///
 /// This represents all possible responses to an event - except for null.
 #[derive(SqlType)]
-#[mysql_type = "String"]
+#[diesel(mysql_type(name = "String"))]
 pub struct ResponseType;
 
 /// This represents all possible responses to an event -
@@ -34,7 +32,7 @@ pub struct ResponseType;
 /// This is the enum to use in business logic.
 /// For use in the database schema, use the ResponseType struct via ```enums::exports::ResponseType```
 #[derive(Clone, Copy, Debug, FromSqlRow, AsExpression)]
-#[sql_type = "ResponseType"]
+#[diesel(sql_type = ResponseType)]
 pub enum Response {
     Yes,
     No,
@@ -42,12 +40,12 @@ pub enum Response {
 }
 
 /// Converts the rust enum options into SQL enum options.
-impl<Db: Backend> ToSql<ResponseType, Db> for Response {
-    fn to_sql<W: Write>(&self, out: &mut Output<W, Db>) -> serialize::Result {
+impl ToSql<ResponseType, Mysql> for Response {
+    fn to_sql(&self, out: &mut Output<Mysql>) -> serialize::Result {
         match *self {
             Response::Yes => out.write_all(b"yes")?,
             Response::No => out.write_all(b"no")?,
-            Response::Maybe => out.write_all(b"maybe")?
+            Response::Maybe => out.write_all(b"maybe")?,
         }
         Ok(IsNull::No)
     }
@@ -55,8 +53,10 @@ impl<Db: Backend> ToSql<ResponseType, Db> for Response {
 
 /// Converts the SQL enum options into rust enum options
 impl FromSql<ResponseType, Mysql> for Response {
-    fn from_sql(bytes: Option<&<Mysql as Backend>::RawValue>) -> deserialize::Result<Self> {
-        match not_none!(bytes) {
+    fn from_sql(value: backend::RawValue<'_, Mysql>) -> deserialize::Result<Self> {
+        let bytes = value.as_bytes();
+
+        match bytes {
             b"yes" => Ok(Response::Yes),
             b"no" => Ok(Response::No),
             b"maybe" => Ok(Response::Maybe),
@@ -65,12 +65,11 @@ impl FromSql<ResponseType, Mysql> for Response {
     }
 }
 
-
 /// ONLY FOR USE IN DATABASE SCHEMA - use ```enums::Channel``` in business logic!
 ///
 /// This represents all possible communication channels.
 #[derive(SqlType)]
-#[mysql_type = "String"]
+#[diesel(mysql_type(name = "String"))]
 pub struct ChannelType;
 
 /// This represents all possible communication channels for a message -
@@ -79,7 +78,7 @@ pub struct ChannelType;
 /// This is the enum to use in business logic.
 /// For use in the database schema, use the ChannelType struct via ```enums::exports::ChannelType```
 #[derive(Clone, Copy, Debug, FromSqlRow, AsExpression)]
-#[sql_type = "ChannelType"]
+#[diesel(sql_type = ChannelType)]
 pub enum Channel {
     None,
     Email,
@@ -88,13 +87,13 @@ pub enum Channel {
 }
 
 /// Converts the rust enum options into SQL enum options.
-impl<Db: Backend> ToSql<ChannelType, Db> for Channel {
-    fn to_sql<W: Write>(&self, out: &mut Output<W, Db>) -> serialize::Result {
+impl ToSql<ChannelType, Mysql> for Channel {
+    fn to_sql(&self, out: &mut Output<Mysql>) -> serialize::Result {
         match *self {
             Channel::None => out.write_all(b"none")?,
             Channel::Email => out.write_all(b"email")?,
             Channel::Push => out.write_all(b"push")?,
-            Channel::Telegram => out.write_all(b"telegram")?
+            Channel::Telegram => out.write_all(b"telegram")?,
         }
         Ok(IsNull::No)
     }
@@ -102,8 +101,10 @@ impl<Db: Backend> ToSql<ChannelType, Db> for Channel {
 
 /// Converts the SQL enum options into rust enum options
 impl FromSql<ChannelType, Mysql> for Channel {
-    fn from_sql(bytes: Option<&<Mysql as Backend>::RawValue>) -> deserialize::Result<Self> {
-        match not_none!(bytes) {
+    fn from_sql(value: backend::RawValue<'_, Mysql>) -> deserialize::Result<Self> {
+        let bytes = value.as_bytes();
+
+        match bytes {
             b"none" => Ok(Channel::None),
             b"email" => Ok(Channel::Email),
             b"push" => Ok(Channel::Push),
@@ -118,7 +119,7 @@ impl FromSql<ChannelType, Mysql> for Channel {
 /// This represents all possible sections a user can be part of.
 /// A user only has one section (legacy).
 #[derive(SqlType)]
-#[mysql_type = "String"]
+#[diesel(mysql_type(name = "String"))]
 pub struct SectionType;
 
 /// This represents all possible sections a user can be part of.
@@ -127,7 +128,7 @@ pub struct SectionType;
 /// This is the enum to use in business logic.
 /// For use in the database schema, use the ChannelType struct via ```enums::exports::SectionType```
 #[derive(Clone, Copy, Debug, FromSqlRow, AsExpression)]
-#[sql_type = "SectionType"]
+#[diesel(sql_type = SectionType)]
 pub enum Section {
     Sopran,
     Alt,
@@ -138,15 +139,15 @@ pub enum Section {
 }
 
 /// Converts the rust enum options into SQL enum options.
-impl<Db: Backend> ToSql<SectionType, Db> for Section {
-    fn to_sql<W: Write>(&self, out: &mut Output<W, Db>) -> serialize::Result {
+impl ToSql<SectionType, Mysql> for Section {
+    fn to_sql(&self, out: &mut Output<Mysql>) -> serialize::Result {
         match *self {
             Section::Sopran => out.write_all(b"Sopran")?,
             Section::Alt => out.write_all(b"Alt")?,
             Section::Tenor => out.write_all(b"Tenor")?,
             Section::Bass => out.write_all(b"Bass")?,
             Section::Dirigent => out.write_all(b"Dirigent")?,
-            Section::Instrument => out.write_all(b"Instrument")?
+            Section::Instrument => out.write_all(b"Instrument")?,
         }
         Ok(IsNull::No)
     }
@@ -154,8 +155,10 @@ impl<Db: Backend> ToSql<SectionType, Db> for Section {
 
 /// Converts the SQL enum options into rust enum options
 impl FromSql<SectionType, Mysql> for Section {
-    fn from_sql(bytes: Option<&<Mysql as Backend>::RawValue>) -> deserialize::Result<Self> {
-        match not_none!(bytes) {
+    fn from_sql(value: backend::RawValue<'_, Mysql>) -> deserialize::Result<Self> {
+        let bytes = value.as_bytes();
+
+        match bytes {
             b"Sopran" => Ok(Section::Sopran),
             b"Alt" => Ok(Section::Alt),
             b"Tenor" => Ok(Section::Tenor),
@@ -166,4 +169,3 @@ impl FromSql<SectionType, Mysql> for Section {
         }
     }
 }
-

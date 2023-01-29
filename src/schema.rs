@@ -1,3 +1,5 @@
+use diesel::{allow_tables_to_appear_in_same_query, joinable, table};
+
 table! {
     events (id) {
         id -> Integer,
@@ -13,7 +15,8 @@ table! {
 }
 
 table! {
-    userevents (id) {
+    #[allow(non_snake_case)]
+    userEvents (id) {
         id -> Integer,
         userId -> Integer,
         eventId -> Integer,
@@ -23,7 +26,8 @@ table! {
 }
 
 table! {
-    userpushconfig (id) {
+    #[allow(non_snake_case)]
+    userPushConfig (id) {
         id -> Integer,
         userId -> Integer,
         deviceName -> Varchar,
@@ -62,13 +66,24 @@ table! {
     }
 }
 
-joinable!(userevents -> events (eventId));
-joinable!(userevents -> users (userId));
-joinable!(userpushconfig -> users (userId));
+table! {
+    #[allow(non_snake_case)]
+    blogPosts (id) {
+        id -> Integer,
+        authorId -> Nullable<Integer>,
+        createdAt -> Datetime,
+        updatedAt -> Datetime,
+        header -> Nullable<Varchar>,
+        content -> Nullable<Text>,
+    }
+}
 
-allow_tables_to_appear_in_same_query!(
-    events,
-    userevents,
-    userpushconfig,
-    users,
-);
+joinable!(userEvents -> events (eventId));
+joinable!(userEvents -> users (userId));
+joinable!(userPushConfig -> users (userId));
+joinable!(blogPosts -> users (authorId));
+
+allow_tables_to_appear_in_same_query!(events, userEvents, userPushConfig, users, blogPosts);
+
+/*
+ */
