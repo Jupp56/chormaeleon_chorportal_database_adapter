@@ -1,6 +1,6 @@
 pub use diesel::mysql::MysqlConnection;
 pub use diesel::prelude::*;
-pub use diesel::r2d2::ConnectionManager;
+use diesel;
 
 pub mod models;
 
@@ -9,6 +9,8 @@ pub use crate::models::*;
 pub mod enums;
 
 pub mod schema;
+
+pub use r2d2;
 
 pub fn format_database_url(
     username: &str,
@@ -21,6 +23,15 @@ pub fn format_database_url(
 
 pub fn establish_connection(database_url: &str) -> Result<MysqlConnection, ConnectionError> {
     MysqlConnection::establish(database_url)
+}
+
+pub fn create_connection_pool(database_url: &str) -> Result<diesel::r2d2::Pool<diesel::r2d2::ConnectionManager<MysqlConnection>>, r2d2::Error> {
+    let manager = diesel::r2d2::ConnectionManager::<MysqlConnection>::new(database_url);
+    // Refer to the `r2d2` documentation for more methods to use
+    // when building a connection pool
+    diesel::r2d2::Pool::builder()
+        .test_on_check_out(true)
+        .build(manager)
 }
 
 #[cfg(test)]
